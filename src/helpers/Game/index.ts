@@ -1,7 +1,9 @@
 import * as THREE from 'three';
 
+import { BaseEntity } from './Entities';
 import { EGameEvents } from 'src/types';
-import { disposeObject } from 'src/utils';
+import { IS_DEV } from 'src/constants';
+import { StatsSystem } from './Systems';
 
 export class Game extends THREE.EventDispatcher<any> {
   private _renderer: THREE.WebGLRenderer; // Webgl renderer
@@ -12,6 +14,9 @@ export class Game extends THREE.EventDispatcher<any> {
   private _pixelRatio: number = window.devicePixelRatio; // Display ratio
   private _aspect: number = 1; // Camera aspect
 
+  // Systems
+  private _statsSystem: StatsSystem = new StatsSystem(this);
+
   constructor(private readonly _container: HTMLDivElement) {
     super();
 
@@ -20,24 +25,29 @@ export class Game extends THREE.EventDispatcher<any> {
     this._aspect = this._width / this._height;
 
     // Initialize webgl renderer
-    this._renderer = new THREE.WebGLRenderer({
+    const renderer = new THREE.WebGLRenderer({
       antialias: !(this._pixelRatio > 1),
       alpha: true,
     });
-    this._renderer.setPixelRatio(this._pixelRatio);
-    this._renderer.setSize(this._width, this._height);
-    this._renderer.xr.enabled = true;
-    this._container.appendChild(this._renderer.domElement);
+    renderer.setPixelRatio(this._pixelRatio);
+    renderer.setSize(this._width, this._height);
+    renderer.xr.enabled = true;
+    this._container.appendChild(renderer.domElement);
+    this._renderer = renderer;
 
     // Initialize scene
-    this._scene = new THREE.Scene();
-    this._scene.background = new THREE.Color(0x00ff00);
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x00ff00);
+    this._scene = scene;
 
+    // TODO Expecting camera to be inherited to core entity
     // Initialize camera
-    this._camera = new THREE.PerspectiveCamera(45, this._aspect, 0.1, 1000);
-    this._camera.position.set(0, 1.6, 1.5);
-    this._scene.add(this._camera);
+    const camera = new THREE.PerspectiveCamera(45, this._aspect, 0.1, 1000);
+    camera.position.set(0, 1.6, 1.5);
+    this._scene.add(camera);
+    this._camera = camera;
 
+    // TODO Expecting lights to be inherited to core entity
     // Initialize lights
     const directLight = new THREE.DirectionalLight(0xffffff, 0.5);
     const ambientLight = new THREE.AmbientLight(0x404040);
@@ -46,8 +56,28 @@ export class Game extends THREE.EventDispatcher<any> {
   }
 
   // Getter of container
-  get container() {
+  get container(): HTMLDivElement {
     return this._container;
+  }
+
+  // Getter of width
+  get width(): number {
+    return this._width;
+  }
+
+  // Getter of height
+  get height(): number {
+    return this._height;
+  }
+
+  // Getter of pixelRatio
+  get pixelRatio(): number {
+    return this._pixelRatio;
+  }
+
+  // Getter of aspect
+  get aspect(): number {
+    return this._aspect;
   }
 
   // Getter of webgl renderer
@@ -55,41 +85,43 @@ export class Game extends THREE.EventDispatcher<any> {
     return this._renderer;
   }
 
-  // Getter of camera
-  get camera() {
-    return this._camera;
-  }
-
   // Getter of Scene
   get scene() {
     return this._scene;
+  }
+
+  // Getter of camera
+  get camera() {
+    return this._camera;
   }
 
   /**
    * Initialize game scene and other rest functionalities
    */
   async init() {
-    await this._loadAssets();
+    // Dev systems, which are visible only in dev environment
+    if (IS_DEV) {
+      this._statsSystem.init();
+    }
     this._addEventListeners();
-    this._addGameObjects();
-    this._addStats();
 
     // Dipatch event that says game is ready to play
     this.dispatchEvent({ type: EGameEvents.INITIALIZED });
 
-    this._update();
+    // Loop
+    this._renderer.setAnimationLoop(this._update);
   }
 
-  /**
-   * Load assets
-   */
-  private async _loadAssets() {
-    try {
-      // TODO Loading logic
-    } catch (error) {
-      console.error(error);
-    }
-  }
+  // /**
+  //  * Load assets
+  //  */
+  // private async _loadAssets() {
+  //   try {
+  //     // TODO Loading logic
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  // }
 
   /**
    * Add event listeners
@@ -105,24 +137,39 @@ export class Game extends THREE.EventDispatcher<any> {
     window.removeEventListener('resize', this._onWindowResize, false);
   };
 
-  /**
-   * Add stats
-   */
-  private _addStats() {
-    // TODO Add custom stats here
-  }
+  // /**
+  //  * Add game objects
+  //  */
+  // private _addGameObjects() {
+  //   const sphereGeo = new THREE.SphereGeometry(1, 32, 16);
+  //   const sphereMat = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+  //   const sphere = new THREE.Mesh(sphereGeo, sphereMat);
+  //   sphere.position.set(0, 0, -3);
+  //   this._scene.add(sphere);
 
-  /**
-   * Add game objects
-   */
-  private _addGameObjects() {
-    // TODO Placeholder of gameobjects
-    const sphereGeo = new THREE.SphereGeometry(1, 32, 16);
-    const sphereMat = new THREE.MeshBasicMaterial({ color: 0xff0000 });
-    const sphere = new THREE.Mesh(sphereGeo, sphereMat);
-    sphere.position.set(0, 0, -3);
-    this._scene.add(sphere);
-  }
+  //   const geometry = new THREE.BufferGeometry();
+  //   geometry.setFromPoints([new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 0, -5)]);
+
+  //   const controller1 = this._renderer.xr.getController(0);
+  //   controller1.add(new THREE.Line(geometry));
+  //   this._scene.add(controller1);
+
+  //   const controller2 = this._renderer.xr.getController(1);
+  //   controller2.add(new THREE.Line(geometry));
+  //   this._scene.add(controller2);
+
+  //   //
+
+  //   const controllerModelFactory = new XRControllerModelFactory();
+
+  //   const controllerGrip1 = this._renderer.xr.getControllerGrip(0);
+  //   controllerGrip1.add(controllerModelFactory.createControllerModel(controllerGrip1));
+  //   this._scene.add(controllerGrip1);
+
+  //   const controllerGrip2 = this._renderer.xr.getControllerGrip(1);
+  //   controllerGrip2.add(controllerModelFactory.createControllerModel(controllerGrip2));
+  //   this._scene.add(controllerGrip2);
+  // }
 
   /**
    * Window resize listener
@@ -139,26 +186,61 @@ export class Game extends THREE.EventDispatcher<any> {
   };
 
   /**
+   * Add entity object to scene
+   * Mostly called from systems
+   * @param entity
+   * @returns
+   */
+  addEntity(entity: BaseEntity, parentEntity: BaseEntity | null = null) {
+    try {
+      const object3D = entity.object3D;
+
+      if (object3D === null) throw `Object3D not found to add to scene: ${entity.id}`;
+
+      if (parentEntity === null) {
+        // Add to scene directly
+        this._scene.add(object3D);
+      } else {
+        // Try to add to given parent
+        const parentObject3D = parentEntity.object3D;
+
+        if (parentObject3D === null) throw `Parent object3D is invalid: ${parentEntity.id}`;
+
+        parentObject3D.add(object3D);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  /**
+   * Remove entity object from scene
+   * Mostly called from systems
+   * @param entity
+   * @returns
+   */
+  removeEntity(entity?: BaseEntity) {
+    entity?.object3D?.removeFromParent();
+  }
+
+  /**
    * Update
    */
   private _update = () => {
-    this._renderer.setAnimationLoop(this._update);
-
-    this._render();
-  };
-
-  /**
-   * Render
-   */
-  private _render() {
+    // Render scene
     this._renderer.render(this._scene, this._camera);
-  }
+
+    // Update systems
+    this._statsSystem.update();
+  };
 
   /**
    * Dispose
    */
   dispose() {
     this._removeEventListeners();
-    disposeObject(this._scene);
+
+    // Dispose systems
+    this._statsSystem.dispose();
   }
 }
