@@ -21,8 +21,12 @@ export abstract class System {
    * Add single entity
    * @param entity
    */
-  addEntity(entity: Entity) {
-    this._game.scene.add(entity);
+  addEntity(entity: Entity, parent?: THREE.Object3D) {
+    if (parent) {
+      parent.add(entity);
+    } else {
+      this._game.scene.add(entity);
+    }
     this._entities[entity.id] = entity;
   }
 
@@ -30,8 +34,8 @@ export abstract class System {
    * Add multiple entities
    * @param entities
    */
-  addEntities(entities: Entity[]) {
-    entities.forEach((entity) => this.addEntity(entity));
+  addEntities(entities: Entity[], parent?: THREE.Object3D) {
+    entities.forEach((entity) => this.addEntity(entity, parent));
   }
 
   /**

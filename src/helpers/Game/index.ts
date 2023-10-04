@@ -1,8 +1,9 @@
 import * as THREE from 'three';
 
+import { RigSystem, StatsSystem } from './Systems';
+
 import { EGameEvents } from 'src/types';
 import { IS_DEV } from 'src/constants';
-import { StatsSystem } from './Systems';
 
 export class Game extends THREE.EventDispatcher<any> {
   // Renderer related attributes
@@ -15,6 +16,7 @@ export class Game extends THREE.EventDispatcher<any> {
   private _aspect: number = 1; // Camera aspect
 
   // Systems
+  private _rigSystem: RigSystem = new RigSystem(this);
   private _statsSystem: StatsSystem = new StatsSystem(this);
 
   private _prevIsXR: boolean = false;
@@ -101,10 +103,13 @@ export class Game extends THREE.EventDispatcher<any> {
    * Initialize game scene and other rest functionalities
    */
   async init() {
+    this._rigSystem.init();
+
     // Dev systems, which are visible only in dev environment
     if (IS_DEV) {
       this._statsSystem.init();
     }
+
     this._addEventListeners();
 
     // Dipatch event that says game is ready to play
@@ -139,40 +144,6 @@ export class Game extends THREE.EventDispatcher<any> {
     window.removeEventListener('resize', this._onWindowResize, false);
   };
 
-  // /**
-  //  * Add game objects
-  //  */
-  // private _addGameObjects() {
-  //   const sphereGeo = new THREE.SphereGeometry(1, 32, 16);
-  //   const sphereMat = new THREE.MeshBasicMaterial({ color: 0xff0000 });
-  //   const sphere = new THREE.Mesh(sphereGeo, sphereMat);
-  //   sphere.position.set(0, 0, -3);
-  //   this._scene.add(sphere);
-
-  //   const geometry = new THREE.BufferGeometry();
-  //   geometry.setFromPoints([new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 0, -5)]);
-
-  //   const controller1 = this._renderer.xr.getController(0);
-  //   controller1.add(new THREE.Line(geometry));
-  //   this._scene.add(controller1);
-
-  //   const controller2 = this._renderer.xr.getController(1);
-  //   controller2.add(new THREE.Line(geometry));
-  //   this._scene.add(controller2);
-
-  //   //
-
-  //   const controllerModelFactory = new XRControllerModelFactory();
-
-  //   const controllerGrip1 = this._renderer.xr.getControllerGrip(0);
-  //   controllerGrip1.add(controllerModelFactory.createControllerModel(controllerGrip1));
-  //   this._scene.add(controllerGrip1);
-
-  //   const controllerGrip2 = this._renderer.xr.getControllerGrip(1);
-  //   controllerGrip2.add(controllerModelFactory.createControllerModel(controllerGrip2));
-  //   this._scene.add(controllerGrip2);
-  // }
-
   /**
    * Window resize listener
    */
@@ -193,14 +164,17 @@ export class Game extends THREE.EventDispatcher<any> {
   private _update = () => {
     // Entered/Exited XR mode
     if (this._renderer.xr.isPresenting !== this._prevIsXR) {
-      this._prevIsXR = !this._prevIsXR;
-      this._statsSystem.onXRPresent(this._prevIsXR);
+      const prevIsXR = !this._prevIsXR;
+      this._rigSystem.onXRPresent(prevIsXR);
+      this._statsSystem.onXRPresent(prevIsXR);
+      this._prevIsXR = prevIsXR;
     }
 
     // Render scene
     this._renderer.render(this._scene, this._camera);
 
     // Update systems
+    this._rigSystem.update();
     this._statsSystem.update();
   };
 
@@ -211,6 +185,7 @@ export class Game extends THREE.EventDispatcher<any> {
     this._removeEventListeners();
 
     // Dispose systems
+    this._rigSystem.dispose();
     this._statsSystem.dispose();
   }
 }
