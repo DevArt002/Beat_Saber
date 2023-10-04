@@ -1,4 +1,5 @@
 import { Entity } from './Entity';
+import { HAND_HEIGHT } from 'src/constants';
 import { RigSystem } from 'src/helpers/Game/Systems';
 
 export class XRRigEntity extends Entity {
@@ -19,6 +20,7 @@ export class XRRigEntity extends Entity {
       const controller2 = renderer.xr.getController(1);
       controller2.add(leftSaber);
       this.add(controller2);
+      this.position.y = HAND_HEIGHT;
     }
   }
 

@@ -1,9 +1,9 @@
 import * as THREE from 'three';
 
-import { RigSystem, StatsSystem } from './Systems';
+import { BeatSaberSystem, RigSystem, StatsSystem } from './Systems';
+import { IS_DEV, RIG_HEIGHT } from 'src/constants';
 
 import { EGameEvents } from 'src/types';
-import { IS_DEV } from 'src/constants';
 
 export class Game extends THREE.EventDispatcher<any> {
   // Renderer related attributes
@@ -17,6 +17,7 @@ export class Game extends THREE.EventDispatcher<any> {
 
   // Systems
   private _rigSystem: RigSystem = new RigSystem(this);
+  private _beatSaberSystem: BeatSaberSystem = new BeatSaberSystem(this);
   private _statsSystem: StatsSystem = new StatsSystem(this);
 
   private _prevIsXR: boolean = false;
@@ -36,6 +37,7 @@ export class Game extends THREE.EventDispatcher<any> {
     renderer.setPixelRatio(this._pixelRatio);
     renderer.setSize(this._width, this._height);
     renderer.xr.enabled = true;
+    renderer.xr.setReferenceSpaceType('local');
     this._container.appendChild(renderer.domElement);
     this._renderer = renderer;
 
@@ -47,7 +49,7 @@ export class Game extends THREE.EventDispatcher<any> {
     // TODO Expecting camera to be inherited to core entity
     // Initialize camera
     const camera = new THREE.PerspectiveCamera(45, this._aspect, 0.1, 1000);
-    camera.position.set(0, 1.6, 1.5);
+    camera.position.set(0, RIG_HEIGHT, 0);
     this._scene.add(camera);
     this._camera = camera;
 
@@ -104,6 +106,7 @@ export class Game extends THREE.EventDispatcher<any> {
    */
   async init() {
     this._rigSystem.init();
+    this._beatSaberSystem.init();
 
     // Dev systems, which are visible only in dev environment
     if (IS_DEV) {
@@ -166,6 +169,7 @@ export class Game extends THREE.EventDispatcher<any> {
     if (this._renderer.xr.isPresenting !== this._prevIsXR) {
       const prevIsXR = !this._prevIsXR;
       this._rigSystem.onXRPresent(prevIsXR);
+      this._beatSaberSystem.onXRPresent(prevIsXR);
       this._statsSystem.onXRPresent(prevIsXR);
       this._prevIsXR = prevIsXR;
     }
@@ -175,6 +179,7 @@ export class Game extends THREE.EventDispatcher<any> {
 
     // Update systems
     this._rigSystem.update();
+    this._beatSaberSystem.update();
     this._statsSystem.update();
   };
 
@@ -186,6 +191,7 @@ export class Game extends THREE.EventDispatcher<any> {
 
     // Dispose systems
     this._rigSystem.dispose();
+    this._beatSaberSystem.dispose();
     this._statsSystem.dispose();
   }
 }

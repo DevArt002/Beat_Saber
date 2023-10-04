@@ -15,6 +15,8 @@ export enum EPeerDataType {
   PLAYER_UPDATE,
 }
 
+export type TXY = [number, number];
+
 export type TXYZ = [number, number, number];
 
 export type TEntityID = number;

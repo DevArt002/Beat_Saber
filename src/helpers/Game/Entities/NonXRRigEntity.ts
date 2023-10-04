@@ -1,3 +1,5 @@
+import { HAND_HEIGHT, RIG_HEIGHT } from 'src/constants';
+
 import { Entity } from './Entity';
 import { RigSystem } from 'src/helpers/Game/Systems';
 
@@ -15,7 +17,7 @@ export class NonXRRigEntity extends Entity {
       this.add(rightSaber);
       leftSaber.position.x -= 0.2;
       rightSaber.position.x += 0.2;
-      this.position.set(0, -0.2, 0);
+      this.position.y -= RIG_HEIGHT - HAND_HEIGHT;
     }
   }
 

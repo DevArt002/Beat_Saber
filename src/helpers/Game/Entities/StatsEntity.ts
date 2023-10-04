@@ -16,7 +16,7 @@ export class StatsEntity extends InteractiveGroup implements Entity {
     if (stats !== null) {
       const statsMesh = new HTMLMesh(stats.dom);
       statsMesh.position.x = 0;
-      statsMesh.position.y = 1.5;
+      statsMesh.position.y = 1.8;
       statsMesh.position.z = -1;
       statsMesh.rotation.x = Math.PI / 4;
       statsMesh.scale.setScalar(2.5);

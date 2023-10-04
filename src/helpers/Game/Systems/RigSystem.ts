@@ -1,3 +1,4 @@
+import { HAND_HEIGHT, RIG_HEIGHT } from 'src/constants';
 import { NonXRRigEntity, SaberEntity, XRRigEntity } from 'src/helpers/Game/Entities';
 
 import { Game } from 'src/helpers';
@@ -82,13 +83,24 @@ export class RigSystem extends System {
    */
   onXRPresent(isPresenting: boolean) {
     if (this._xrRigEntity === null || this._nonXRRigEntity === null) return;
+    const { camera, scene } = this._game;
 
     if (isPresenting) {
+      // Add camera to xr rig
+      camera.position.y = RIG_HEIGHT - HAND_HEIGHT;
+      this._xrRigEntity.add(camera);
+      // Add xr rig
       this.addEntity(this._xrRigEntity);
+      // Remove non-xr rig
       this.removeEntity(this._nonXRRigEntity.id);
     } else {
+      // Add camera to scene root
+      camera.position.y = RIG_HEIGHT;
+      scene.add(camera);
+      // Remove xr rig
       this.removeEntity(this._xrRigEntity.id);
-      this.addEntity(this._nonXRRigEntity, this._game.camera);
+      // Add non-xr rig
+      this.addEntity(this._nonXRRigEntity, camera);
     }
   }
 

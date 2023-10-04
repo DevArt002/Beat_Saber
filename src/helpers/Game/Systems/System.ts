@@ -77,6 +77,12 @@ export abstract class System {
   abstract init(): void;
 
   /**
+   * Listener when xr presenting state is changed
+   * @param isPresenting
+   */
+  onXRPresent(isPresenting: boolean) {}
+
+  /**
    * Update
    */
   update() {
