@@ -112,10 +112,13 @@ export class NoteEntity extends Entity<THREE.Mesh> {
   }
 
   /**
-   * Stop
+   * Stop playing
    */
   stop() {
     this._isPlaying = false;
+    this.position.set(0, 0, 0);
+    this.rotation.set(0, 0, 0);
+    this._updateInstanceMatrix();
   }
 
   /**

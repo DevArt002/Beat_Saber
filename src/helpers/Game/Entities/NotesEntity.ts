@@ -55,6 +55,16 @@ export class NotesEntity extends Entity<THREE.InstancedMesh> {
   }
 
   /**
+   * Stop playing
+   * @returns
+   */
+  stop() {
+    for (const noteEntity of this._noteEntities) {
+      noteEntity.stop();
+    }
+  }
+
+  /**
    * Listener when xr presenting state is changed
    * @param isPresenting
    */

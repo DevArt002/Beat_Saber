@@ -176,6 +176,7 @@ export class BeatSaberSystem extends System {
     this._clock.stop();
     this._track.pause();
     this._track.currentTime = 0;
+    this._notesEntity?.stop();
   }
 
   /**

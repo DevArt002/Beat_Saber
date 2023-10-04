@@ -223,6 +223,7 @@ export class Game extends THREE.EventDispatcher<any> {
    * Dispose
    */
   dispose() {
+    this._renderer.domElement.remove();
     this._removeEventListeners();
 
     // Dispose systems
