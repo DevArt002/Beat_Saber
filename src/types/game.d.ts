@@ -1,5 +1,4 @@
 import { DataConnection, PeerError } from 'peerjs';
-import { Entity } from 'src/helpers/Game/Entities';
 import * as THREE from 'three';
 
 export enum EGameEvents {
@@ -19,6 +18,11 @@ export enum EPeerDataType {
   INITIAL_CONNECT,
   Ready,
   PLAYER,
+}
+
+export enum ESaberType {
+  LEFT,
+  RIGHT,
 }
 
 export enum ENoteType {

@@ -1,11 +1,12 @@
 import * as THREE from 'three';
 
-import { ENoteCutDirection, ENoteType } from 'src/types';
+import { ENoteCutDirection, ENoteType, ESaberType } from 'src/types';
 
 import { ColliderComponent } from 'src/helpers/Game/Components';
 import { Entity } from './Entity';
 import { NotesEntity } from './NotesEntity';
 import { ROTATION_BY_CUT_DIR } from 'src/constants';
+import { SaberEntity } from './SaberEntity';
 import { getHexColorByNoteType } from 'src/utils';
 
 export class NoteEntity extends Entity<THREE.Mesh> {
@@ -32,6 +33,8 @@ export class NoteEntity extends Entity<THREE.Mesh> {
     this.addComponent(colliderComponent);
     // Saber entities are collidable with notes
     colliderComponent.collidableEntities = new Set((saberEntities ?? []) as Entity<THREE.Mesh>[]);
+    // Callback when collide
+    colliderComponent.onCollide = this.onCollide;
     this._colliderComponent = colliderComponent;
   }
 
@@ -186,6 +189,28 @@ export class NoteEntity extends Entity<THREE.Mesh> {
     this._notesEntity.object3D.setMatrixAt(this._index, this.matrix);
     this._notesEntity.object3D.instanceMatrix.needsUpdate = true;
   }
+
+  /**
+   * Listener when xr presenting state is changed
+   * @param entity
+   */
+  onCollide = (entity: Entity<THREE.Mesh>) => {
+    const { _noteType, _notesEntity } = this;
+    const { type } = entity as SaberEntity;
+
+    // Stop playing this note
+    this.stop();
+
+    // Calculate score
+    if (
+      (type === ESaberType.LEFT && _noteType !== ENoteType.BLUE) ||
+      (type === ESaberType.RIGHT && _noteType !== ENoteType.RED)
+    ) {
+      _notesEntity.beatSaberSystem.score = _notesEntity.beatSaberSystem.score + 100;
+    } else {
+      _notesEntity.beatSaberSystem.score = _notesEntity.beatSaberSystem.score - 50;
+    }
+  };
 
   /**
    * Listener when xr presenting state is changed

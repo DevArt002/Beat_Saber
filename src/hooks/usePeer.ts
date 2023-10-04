@@ -143,13 +143,14 @@ export const usePeer = (
   // Handler for submit on connect form
   const onConnect = useCallback(
     (destPeerId: TPeerId) => {
+      toggleOnConnected();
       connectPeer(destPeerId, {
         onOpen: onConnectionOpen,
         onClose: onConnectionClose,
         onReceivedData: onConnectionReceivedData,
       });
     },
-    [onConnectionOpen, onConnectionClose, onConnectionReceivedData],
+    [toggleOnConnected, onConnectionOpen, onConnectionClose, onConnectionReceivedData],
   );
 
   // Handler for disconnect

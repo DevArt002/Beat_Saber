@@ -6,6 +6,7 @@ import {
   FloorEntity,
   NotesEntity,
   SaberEntity,
+  ScoreEntity,
 } from 'src/helpers/Game/Entities';
 import { EPeerDataType, INoteCubeData } from 'src/types';
 
@@ -19,6 +20,7 @@ export class BeatSaberSystem extends System {
   // Entities
   private _floorEntity: FloorEntity | null = null;
   private _notesEntity: NotesEntity | null = null;
+  private _scoreEntity: ScoreEntity | null = null;
 
   // Beat saber parameters
   private readonly _bpm: number; // beats per min
@@ -35,7 +37,6 @@ export class BeatSaberSystem extends System {
   private readonly _track = new Audio(BEAT_SABER_TRACK);
   private _isPlaying: boolean = false;
   private _prevBeat: number = -1;
-  private _score: number = 0;
 
   constructor(game: Game) {
     super(game);
@@ -89,9 +90,21 @@ export class BeatSaberSystem extends System {
     return this._noteMaxFlyDist;
   }
 
+  // Getter of floor size
+  get floorSize(): THREE.Vector2Tuple {
+    return this._floorSize;
+  }
+
   // Getter of score
   get score(): number {
-    return this._score;
+    return this._scoreEntity?.score ?? 0;
+  }
+
+  // Setter of score
+  set score(val: number) {
+    if (!this._scoreEntity) return;
+
+    this._scoreEntity.score = val;
   }
 
   // Getter of playing status
@@ -119,6 +132,11 @@ export class BeatSaberSystem extends System {
     notesEntity.position.z -= this._floorSize[1];
     this.addEntity(notesEntity);
     this._notesEntity = notesEntity;
+
+    // Add score entity
+    const scoreEntity = new ScoreEntity(this);
+    this.addEntity(scoreEntity);
+    this._scoreEntity = scoreEntity;
 
     // Stop clock
     this._clock.stop();
@@ -176,6 +194,7 @@ export class BeatSaberSystem extends System {
     this._clock.stop();
     this._track.pause();
     this._track.currentTime = 0;
+    this.score = 0;
     this._notesEntity?.stop();
   }
 
@@ -216,7 +235,7 @@ export class BeatSaberSystem extends System {
     // Broadcast game data
     this._game.onBroadcastMsg?.({
       type: EPeerDataType.PLAYER,
-      score: this._score,
+      score: this.score,
       sabersMatrix: [this.leftSaber?.matrixWorld, this.rightSaber?.matrixWorld],
     });
 

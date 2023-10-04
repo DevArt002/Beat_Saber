@@ -7,3 +7,4 @@ export * from './SaberEntity';
 export * from './FloorEntity';
 export * from './NoteEntity';
 export * from './NotesEntity';
+export * from './ScoreEntity';

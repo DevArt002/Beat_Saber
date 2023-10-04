@@ -107,10 +107,12 @@ export class RigSystem extends System {
    * @param players
    */
   private _updatePlayers() {
-    Object.entries(this._game.players).forEach(([key, { sabersMatrix }], index) => {
+    // TODO Optimize
+    Object.entries(this._game.players).forEach(([key, { score, sabersMatrix }], index) => {
       // Update the player rig
       if (key in this._playersRigEntities) {
-        const { leftSaber, rightSaber } = this._playersRigEntities[key];
+        const playerRigEntity = this._playersRigEntities[key];
+        const { leftSaber, rightSaber } = playerRigEntity;
 
         if (sabersMatrix[0]) {
           leftSaber.position.setFromMatrixPosition(sabersMatrix[0]);
@@ -121,10 +123,12 @@ export class RigSystem extends System {
           rightSaber.position.setFromMatrixPosition(sabersMatrix[1]);
           rightSaber.quaternion.setFromRotationMatrix(sabersMatrix[1]);
         }
+
+        playerRigEntity.score = score;
       }
       // Create new rig
       else {
-        const playerRigEntity = new NonXRRigEntity(this);
+        const playerRigEntity = new NonXRRigEntity(this, false);
         playerRigEntity.position.set(
           3 * (isOddNumber(index) ? 1 : -1) * Math.ceil((index + 1) / 2),
           0,

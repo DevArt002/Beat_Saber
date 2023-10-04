@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 
+import { ESaberType } from 'src/types';
 import { Entity } from './Entity';
 import { RigSystem } from 'src/helpers/Game/Systems';
 import { SaberEntity } from './SaberEntity';
@@ -12,8 +13,8 @@ export class BeatSaberRigEntity extends Entity<THREE.Object3D> {
     super(new THREE.Object3D());
 
     // Saber entities
-    const leftSaber = new SaberEntity(0xff0000);
-    const rightSaber = new SaberEntity(0x0000ff);
+    const leftSaber = new SaberEntity(ESaberType.LEFT);
+    const rightSaber = new SaberEntity(ESaberType.RIGHT);
     leftSaber.position.z -= leftSaber.size[2] / 2;
     rightSaber.position.z -= rightSaber.size[2] / 2;
     this._saberEntities = [leftSaber, rightSaber];
@@ -38,8 +39,8 @@ export class BeatSaberRigEntity extends Entity<THREE.Object3D> {
    * Update
    */
   update(delta?: number) {
-    this.leftSaber.update();
-    this.rightSaber.update();
+    this.leftSaber.update(delta);
+    this.rightSaber.update(delta);
     this._updateComponents(delta);
   }
 

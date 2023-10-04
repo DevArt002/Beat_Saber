@@ -10,6 +10,9 @@ export class ColliderComponent<T extends Entity<THREE.Mesh>> extends Component<T
   private _bbox: THREE.Box3;
   private _collidableEntities: Set<Entity<THREE.Mesh>> = new Set<Entity<THREE.Mesh>>();
 
+  // Callbacks
+  private _onCollide: ((entity: Entity<THREE.Mesh>) => void) | null = null;
+
   constructor(entity: T) {
     super(entity);
 
@@ -34,6 +37,16 @@ export class ColliderComponent<T extends Entity<THREE.Mesh>> extends Component<T
     this._collidableEntities = val;
   }
 
+  // Getter of onCollide
+  get onCollide(): ((entity: Entity<THREE.Mesh>) => void) | null {
+    return this._onCollide;
+  }
+
+  // Setter of onCollide
+  set onCollide(val: ((entity: Entity<THREE.Mesh>) => void) | null) {
+    this._onCollide = val;
+  }
+
   // Getter of collidable colliders
   get collidableColliders(): Set<ColliderComponent<T>> {
     const colliders: ColliderComponent<T>[] = [];
@@ -54,7 +67,7 @@ export class ColliderComponent<T extends Entity<THREE.Mesh>> extends Component<T
   private _checkCollisions() {
     for (const collidableCollider of this.collidableColliders) {
       if (this._bbox.intersectsBox(collidableCollider.bbox)) {
-        console.info('Collide');
+        this._onCollide?.(collidableCollider.entity);
       }
     }
   }
