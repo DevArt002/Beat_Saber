@@ -1,6 +1,12 @@
 import { ChangeEvent, FormEvent, useCallback, useEffect, useState } from 'react';
-import { EPeerDataType, IPeerInitialConnectData, TPeerData, TPeerId } from 'src/types';
-import { connectPeer, disconnectPeers, peer } from 'src/utils';
+import {
+  EPeerDataType,
+  IPeerInitialConnectData,
+  IPeerPlayerData,
+  TPeerData,
+  TPeerId,
+} from 'src/types';
+import { broadcastPeer, broadcastPeers, connectPeer, disconnectPeers, peer } from 'src/utils';
 
 import { DataConnection } from 'peerjs';
 import { useToggle } from './useToggle';
@@ -9,7 +15,9 @@ import { useToggle } from './useToggle';
  * Hooks for peer
  * @returns
  */
-export const usePeer = (): {
+export const usePeer = (
+  players: Record<TPeerId, IPeerPlayerData>,
+): {
   peerId: TPeerId;
   destPeerId: TPeerId;
   connected: boolean;
@@ -17,6 +25,7 @@ export const usePeer = (): {
   onChangeDestPeerId: (e: ChangeEvent<HTMLInputElement>) => void;
   onConnect: (e: FormEvent<HTMLFormElement>) => void;
   onDisconnect: () => void;
+  onBroadcast: (data: TPeerData) => void;
 } => {
   const [peerId, setPeerId] = useState<TPeerId>('');
   const [destPeerId, setDestPeerId] = useState<TPeerId>('');
@@ -35,7 +44,10 @@ export const usePeer = (): {
       setConnections((cur) => {
         if (!(connection.peer in cur)) {
           console.info(`Connected a peer: ${connection.peer}`);
-          connection.send({ type: EPeerDataType.INITIAL_CONNECT, peerIds: Object.keys(cur) });
+          broadcastPeer(connection, {
+            type: EPeerDataType.INITIAL_CONNECT,
+            peerIds: Object.keys(cur),
+          });
         }
         cur[connection.peer] = connection;
 
@@ -58,6 +70,7 @@ export const usePeer = (): {
   // Listen when received data through connection
   const onConnectionReceivedData = useCallback(
     (connection: DataConnection, data: TPeerData) => {
+      // Initial connect data
       if (data.type === EPeerDataType.INITIAL_CONNECT) {
         for (const peerId of (data as IPeerInitialConnectData).peerIds) {
           if (connections[peerId]) continue;
@@ -69,8 +82,12 @@ export const usePeer = (): {
           });
         }
       }
+      // Player data
+      else if (data.type === EPeerDataType.PLAYER) {
+        players[connection.peer] = data as IPeerPlayerData;
+      }
     },
-    [connections, onConnectionOpen, onConnectionClose],
+    [connections, onConnectionOpen, onConnectionClose, players],
   );
 
   // Add peer related listeners
@@ -107,6 +124,14 @@ export const usePeer = (): {
     toggleOffConnected();
   }, [connections, toggleOffConnected]);
 
+  // Handler for broadcast
+  const onBroadcast = useCallback(
+    (data: TPeerData) => {
+      broadcastPeers(Object.values(connections), data);
+    },
+    [connections],
+  );
+
   return {
     peerId,
     destPeerId,
@@ -115,5 +140,6 @@ export const usePeer = (): {
     onChangeDestPeerId,
     onConnect,
     onDisconnect,
+    onBroadcast,
   };
 };

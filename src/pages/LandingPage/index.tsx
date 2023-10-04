@@ -1,14 +1,24 @@
+import { IPeerPlayerData, TPeerId } from 'src/types';
 import { IS_AR_SUPPORT, IS_VR_SUPPORT } from 'src/constants';
+import React, { useRef } from 'react';
 import { useGame, usePeer } from 'src/hooks';
 
 import { LoadingSpinner } from 'src/components';
-import React from 'react';
 import clsx from 'clsx';
 import { requestXRSession } from 'src/utils';
 
 export const LandingPage = () => {
-  const { peerId, destPeerId, connected, onChangeDestPeerId, onConnect, onDisconnect } = usePeer();
-  const { gameContainerRef, gameInstance, loading } = useGame();
+  const playersRef = useRef<Record<TPeerId, IPeerPlayerData>>({});
+  const {
+    peerId,
+    destPeerId,
+    connected,
+    onChangeDestPeerId,
+    onConnect,
+    onDisconnect,
+    onBroadcast,
+  } = usePeer(playersRef.current);
+  const { gameContainerRef, gameInstance, loading } = useGame(playersRef.current, onBroadcast);
 
   return (
     <div className="h-full w-full">

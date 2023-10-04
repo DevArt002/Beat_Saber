@@ -1,10 +1,9 @@
 import * as THREE from 'three';
 
 import { Entity } from './Entity';
-import { TXY } from 'src/types';
 
 export class FloorEntity extends THREE.Mesh implements Entity {
-  private _size: TXY = [3, 20];
+  private _size: THREE.Vector2Tuple = [3, 20];
 
   constructor() {
     super();
@@ -16,7 +15,7 @@ export class FloorEntity extends THREE.Mesh implements Entity {
   }
 
   // Getter of size
-  get size(): TXY {
+  get size(): THREE.Vector2Tuple {
     return this._size;
   }
 

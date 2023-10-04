@@ -1,5 +1,5 @@
 import { DataConnection, PeerError } from 'peerjs';
-import { Matrix4 } from 'three';
+import * as THREE from 'three';
 
 export enum EGameEvents {
   INITIALIZED = 'initialized',
@@ -12,12 +12,8 @@ export enum EComponentType {
 
 export enum EPeerDataType {
   INITIAL_CONNECT,
-  PLAYER_UPDATE,
+  PLAYER,
 }
-
-export type TXY = [number, number];
-
-export type TXYZ = [number, number, number];
 
 export type TEntityID = number;
 
@@ -31,12 +27,12 @@ export interface IPeerInitialConnectData extends IPeerBaseData {
   peerIds: string[]; // Peer ids who joined the lobby already
 }
 
-export interface IPeerPlayerUpdateData extends IPeerBaseData {
+export interface IPeerPlayerData extends IPeerBaseData {
   score: number; // Player score
-  saberTransform: [Matrix4, Matrix4]; // Left/Right saber transform data
+  sabersMatrix: [THREE.Matrix4 | undefined, THREE.Matrix4 | undefined];
 }
 
-export type TPeerData = IPeerInitialConnectData | IPeerPlayerUpdateData;
+export type TPeerData = IPeerInitialConnectData | IPeerPlayerData;
 
 export type TPeerConnectCallbacks = {
   onIceStateChanged?: (connection: DataConnection, state: RTCIceConnectionState) => void;

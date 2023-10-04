@@ -1,9 +1,8 @@
 import * as THREE from 'three';
 
 import { BeatSaberSystem, RigSystem, StatsSystem } from './Systems';
+import { EGameEvents, IPeerPlayerData, TPeerData, TPeerId } from 'src/types';
 import { IS_DEV, RIG_HEIGHT } from 'src/constants';
-
-import { EGameEvents } from 'src/types';
 
 export class Game extends THREE.EventDispatcher<any> {
   // Renderer related attributes
@@ -20,6 +19,10 @@ export class Game extends THREE.EventDispatcher<any> {
   private _beatSaberSystem: BeatSaberSystem = new BeatSaberSystem(this);
   private _statsSystem: StatsSystem = new StatsSystem(this);
 
+  // Callbacks from outside of game
+  private _onBroadcastMsg: ((data: TPeerData) => void) | null = null;
+
+  private _players: Record<TPeerId, IPeerPlayerData> = {};
   private _prevIsXR: boolean = false;
 
   constructor(private readonly _container: HTMLDivElement) {
@@ -87,18 +90,43 @@ export class Game extends THREE.EventDispatcher<any> {
   }
 
   // Getter of webgl renderer
-  get renderer() {
+  get renderer(): THREE.WebGLRenderer {
     return this._renderer;
   }
 
   // Getter of Scene
-  get scene() {
+  get scene(): THREE.Scene {
     return this._scene;
   }
 
   // Getter of camera
-  get camera() {
+  get camera(): THREE.PerspectiveCamera {
     return this._camera;
+  }
+
+  // Getter of rig system
+  get rigSystem(): RigSystem {
+    return this._rigSystem;
+  }
+
+  // Getter of players
+  get players(): Record<TPeerId, IPeerPlayerData> {
+    return this._players;
+  }
+
+  // Setter of players
+  set players(val: Record<TPeerId, IPeerPlayerData>) {
+    this._players = val;
+  }
+
+  // Getter of onBroadcastMsg
+  get onBroadcastMsg(): ((data: TPeerData) => void) | null {
+    return this._onBroadcastMsg;
+  }
+
+  // Setter of onBroadcastMsg
+  set onBroadcastMsg(val: ((data: TPeerData) => void) | null) {
+    this._onBroadcastMsg = val;
   }
 
   /**

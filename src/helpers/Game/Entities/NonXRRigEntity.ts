@@ -1,33 +1,18 @@
 import { HAND_HEIGHT, RIG_HEIGHT } from 'src/constants';
 
-import { Entity } from './Entity';
+import { BeatSaberRigEntity } from './BeatSaberRigEntity';
 import { RigSystem } from 'src/helpers/Game/Systems';
 
-export class NonXRRigEntity extends Entity {
+export class NonXRRigEntity extends BeatSaberRigEntity {
   constructor(rigSystem: RigSystem) {
-    super();
+    super(rigSystem);
 
-    const { saberEntities } = rigSystem;
-    const [sourceLeftSaber, sourceRightSaber] = saberEntities;
+    // Saber entities
+    this.leftSaber.position.x -= 0.2;
+    this.rightSaber.position.x += 0.2;
 
-    if (sourceLeftSaber !== null && sourceRightSaber !== null) {
-      const leftSaber = sourceLeftSaber.clone();
-      const rightSaber = sourceRightSaber.clone();
-      this.add(leftSaber);
-      this.add(rightSaber);
-      leftSaber.position.x -= 0.2;
-      rightSaber.position.x += 0.2;
-      this.position.y -= RIG_HEIGHT - HAND_HEIGHT;
-    }
+    this.add(this.leftSaber);
+    this.add(this.rightSaber);
+    this.position.y -= RIG_HEIGHT - HAND_HEIGHT;
   }
-
-  /**
-   * Update
-   */
-  update() {}
-
-  /**
-   * Dispose
-   */
-  dispose() {}
 }

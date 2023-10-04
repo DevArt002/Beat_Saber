@@ -58,3 +58,21 @@ export function disconnectPeer(connection: DataConnection) {
 export function disconnectPeers(connections: DataConnection[]) {
   connections.map((connection) => disconnectPeer(connection));
 }
+
+/**
+ * Broadcast data to single peer
+ * @param connection
+ * @param data
+ */
+export function broadcastPeer(connection: DataConnection, data: TPeerData) {
+  connection.send(data);
+}
+
+/**
+ * Broadcast data to multiple peers
+ * @param connections
+ * @param data
+ */
+export function broadcastPeers(connections: DataConnection[], data: TPeerData) {
+  connections.forEach((connection) => broadcastPeer(connection, data));
+}

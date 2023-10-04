@@ -1,10 +1,9 @@
 import * as THREE from 'three';
 
 import { Entity } from './Entity';
-import { TXYZ } from 'src/types';
 
 export class SaberEntity extends THREE.Mesh implements Entity {
-  private _size: TXYZ = [0.02, 0.02, 1.5];
+  private _size: THREE.Vector3Tuple = [0.02, 0.02, 1.5];
 
   constructor(private readonly _color: number) {
     super();
@@ -15,7 +14,7 @@ export class SaberEntity extends THREE.Mesh implements Entity {
   }
 
   // Getter of size
-  get size(): TXYZ {
+  get size(): THREE.Vector3Tuple {
     return this._size;
   }
 

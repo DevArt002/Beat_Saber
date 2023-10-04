@@ -1,14 +1,17 @@
+import { EGameEvents, IPeerPlayerData, TPeerData, TPeerId } from 'src/types';
 import { MutableRefObject, useEffect, useRef, useState } from 'react';
 
 import { Game } from 'src/helpers';
 import { useToggle } from './useToggle';
-import { EGameEvents } from 'src/types';
 
 /**
  * Hooks for game
  * @return ref of game container, instance of game, and loading status of game assets
  */
-export const useGame = (): {
+export const useGame = (
+  players: Record<TPeerId, IPeerPlayerData>,
+  onBroadcastMsg: (data: TPeerData) => void,
+): {
   gameContainerRef: MutableRefObject<HTMLDivElement | null>;
   gameInstance: Game | null;
   loading: boolean;
@@ -40,6 +43,22 @@ export const useGame = (): {
       setGameInstance(null);
     };
   }, [toggleOffLoading]);
+
+  // Pass updated onBroadcastMsg to game instance, so that game can broadcast its status to peers correctly
+  // TODO Instead of callback, we can setup global function which doesn't depend on state.
+  // or Signal/Event listener is candidate too, but not recommended to make signals/events for broadcast every frame
+  useEffect(() => {
+    if (!gameInstance) return;
+
+    gameInstance.onBroadcastMsg = onBroadcastMsg;
+  }, [gameInstance, onBroadcastMsg]);
+
+  // Update players in game
+  useEffect(() => {
+    if (!gameInstance) return;
+
+    gameInstance.players = players;
+  }, [gameInstance, players]);
 
   return { gameContainerRef, gameInstance, loading };
 };
