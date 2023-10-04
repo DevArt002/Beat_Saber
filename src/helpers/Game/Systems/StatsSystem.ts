@@ -1,9 +1,9 @@
-import { BaseSystem } from './BaseSystem';
 import { Game } from 'src/helpers';
 import Stats from 'three/examples/jsm/libs/stats.module';
 import { StatsEntity } from 'src/helpers/Game/Entities';
+import { System } from './System';
 
-export class StatsSystem extends BaseSystem {
+export class StatsSystem extends System {
   private _stats: Stats | null = null;
   private _container: HTMLDivElement | null = null;
   private _rendererInfoContainer: HTMLDivElement | null = null;

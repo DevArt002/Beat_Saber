@@ -1,2 +1,2 @@
-export * from './BaseSystem';
+export * from './System';
 export * from './StatsSystem';

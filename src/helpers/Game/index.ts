@@ -1,6 +1,5 @@
 import * as THREE from 'three';
 
-import { BaseEntity } from './Entities';
 import { EGameEvents } from 'src/types';
 import { IS_DEV } from 'src/constants';
 import { StatsSystem } from './Systems';
@@ -184,44 +183,6 @@ export class Game extends THREE.EventDispatcher<any> {
     this._camera.updateProjectionMatrix();
     this._renderer.setSize(this._width, this._height);
   };
-
-  /**
-   * Add entity object to scene
-   * Mostly called from systems
-   * @param entity
-   * @returns
-   */
-  addEntity(entity: BaseEntity, parentEntity: BaseEntity | null = null) {
-    try {
-      const object3D = entity.object3D;
-
-      if (object3D === null) throw `Object3D not found to add to scene: ${entity.id}`;
-
-      if (parentEntity === null) {
-        // Add to scene directly
-        this._scene.add(object3D);
-      } else {
-        // Try to add to given parent
-        const parentObject3D = parentEntity.object3D;
-
-        if (parentObject3D === null) throw `Parent object3D is invalid: ${parentEntity.id}`;
-
-        parentObject3D.add(object3D);
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  }
-
-  /**
-   * Remove entity object from scene
-   * Mostly called from systems
-   * @param entity
-   * @returns
-   */
-  removeEntity(entity?: BaseEntity) {
-    entity?.object3D?.removeFromParent();
-  }
 
   /**
    * Update

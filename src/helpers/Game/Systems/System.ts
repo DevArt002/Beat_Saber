@@ -1,9 +1,9 @@
-import { BaseEntity } from 'src/helpers/Game/Entities';
+import { Entity } from 'src/helpers/Game/Entities';
 import { Game } from 'src/helpers';
 import { TEntityID } from 'src/types';
 
-export abstract class BaseSystem {
-  protected _entities: Record<TEntityID, BaseEntity> = {};
+export abstract class System {
+  protected _entities: Record<TEntityID, Entity> = {};
 
   constructor(protected readonly _game: Game) {}
 
@@ -13,19 +13,16 @@ export abstract class BaseSystem {
   }
 
   // Getter of entities
-  get entities(): Record<TEntityID, BaseEntity> {
+  get entities(): Record<TEntityID, Entity> {
     return this._entities;
   }
-
-  // Initialize system
-  abstract init(): void;
 
   /**
    * Add single entity
    * @param entity
    */
-  addEntity(entity: BaseEntity) {
-    this._game.addEntity(entity);
+  addEntity(entity: Entity) {
+    this._game.scene.add(entity);
     this._entities[entity.id] = entity;
   }
 
@@ -33,7 +30,7 @@ export abstract class BaseSystem {
    * Add multiple entities
    * @param entities
    */
-  addEntities(entities: BaseEntity[]) {
+  addEntities(entities: Entity[]) {
     entities.forEach((entity) => this.addEntity(entity));
   }
 
@@ -42,7 +39,7 @@ export abstract class BaseSystem {
    * @param entityId
    * @returns Entity
    */
-  getEntity(entityId: TEntityID): BaseEntity | null {
+  getEntity(entityId: TEntityID): Entity | null {
     return this._entities[entityId] ?? null;
   }
 
@@ -51,7 +48,7 @@ export abstract class BaseSystem {
    * @param entityIds
    * @returns Entities
    */
-  getEntitys(entityIds: TEntityID[]): Array<BaseEntity | null> {
+  getEntitys(entityIds: TEntityID[]): Array<Entity | null> {
     return entityIds.map((entityId) => this.getEntity(entityId));
   }
 
@@ -60,7 +57,7 @@ export abstract class BaseSystem {
    * @param entityId
    */
   removeEntity(entityId: TEntityID) {
-    this._game.removeEntity(this._entities[entityId]);
+    this._entities[entityId]?.removeFromParent();
     delete this._entities[entityId];
   }
 
@@ -71,6 +68,9 @@ export abstract class BaseSystem {
   removeEntities(entityIds: TEntityID[]) {
     entityIds.map((entityId) => this.removeEntity(entityId));
   }
+
+  // Initialize system
+  abstract init(): void;
 
   /**
    * Update

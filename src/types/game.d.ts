@@ -17,7 +17,7 @@ export enum EPeerDataType {
 
 export type TXYZ = [number, number, number];
 
-export type TEntityID = string;
+export type TEntityID = number;
 
 export type TPeerId = string;
 
