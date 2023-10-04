@@ -1,9 +1,10 @@
 import React from 'react';
+import { LoadingSpinner } from 'src/components';
 
 export const LandingPage = () => {
   return (
-    <div className="h-full w-full">
-      <p>Landing page</p>
+    <div className="flex h-full w-full items-center justify-center bg-gray-900">
+      <LoadingSpinner />
     </div>
   );
 };
