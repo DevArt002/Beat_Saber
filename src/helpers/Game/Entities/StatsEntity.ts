@@ -4,14 +4,14 @@ import { InteractiveGroup } from 'three/examples/jsm/interactive/InteractiveGrou
 import { StatsSystem } from 'src/helpers/Game/Systems';
 import { disposeObject } from 'src/utils';
 
-export class StatsEntity extends InteractiveGroup implements Entity {
+export class StatsEntity extends Entity<InteractiveGroup> {
   private _statsMesh: HTMLMesh | null = null;
 
   constructor(private readonly _statsSystem: StatsSystem) {
     const { stats } = _statsSystem;
     const { renderer, camera } = _statsSystem.game;
 
-    super(renderer, camera);
+    super(new InteractiveGroup(renderer, camera));
 
     if (stats !== null) {
       const statsMesh = new HTMLMesh(stats.dom);
@@ -28,10 +28,11 @@ export class StatsEntity extends InteractiveGroup implements Entity {
   /**
    * Update
    */
-  update() {
-    // TODO Texture doesn't have update function in type definition
+  update(delta?: number) {
+    // TODO Fixme: Texture doesn't have update function in ts, but has in js
     // @ts-ignore
     this._statsMesh?.material.map?.update();
+    this._updateComponents(delta);
   }
 
   /**
@@ -39,6 +40,7 @@ export class StatsEntity extends InteractiveGroup implements Entity {
    */
   dispose() {
     this._statsMesh?.dispose();
-    disposeObject(this);
+    disposeObject(this._object3D);
+    this._disposeComponents();
   }
 }

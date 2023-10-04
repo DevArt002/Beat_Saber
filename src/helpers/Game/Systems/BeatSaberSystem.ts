@@ -54,6 +54,11 @@ export class BeatSaberSystem extends System {
     return this._game.rigSystem.activeRigEntity;
   }
 
+  // Getter of sabers
+  get saberEntities(): [SaberEntity, SaberEntity] | null {
+    return this._game.rigSystem.activeRigEntity?.saberEntities ?? null;
+  }
+
   // Getter of left saber
   get leftSaber(): SaberEntity | null {
     return this.rigEntity?.leftSaber ?? null;
@@ -196,6 +201,14 @@ export class BeatSaberSystem extends System {
   }
 
   /**
+   * Listener when xr presenting state is changed
+   * @param isPresenting
+   */
+  onXRPresent(isPresenting: boolean) {
+    this._notesEntity?.onXRPresent(isPresenting);
+  }
+
+  /**
    * Update
    */
   update() {
@@ -216,8 +229,6 @@ export class BeatSaberSystem extends System {
       this._playNotes(beat);
     }
 
-    for (const key in this._entities) {
-      this._entities[key].update(delta);
-    }
+    this._updateEntities(delta);
   }
 }

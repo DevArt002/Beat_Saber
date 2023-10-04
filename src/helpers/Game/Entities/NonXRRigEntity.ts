@@ -11,8 +11,8 @@ export class NonXRRigEntity extends BeatSaberRigEntity {
     this.leftSaber.position.x -= 0.2;
     this.rightSaber.position.x += 0.2;
 
-    this.add(this.leftSaber);
-    this.add(this.rightSaber);
+    this.add(this.leftSaber.object3D);
+    this.add(this.rightSaber.object3D);
     this.position.y -= RIG_HEIGHT - HAND_HEIGHT;
   }
 }

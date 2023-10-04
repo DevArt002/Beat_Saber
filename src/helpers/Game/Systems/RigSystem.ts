@@ -140,10 +140,7 @@ export class RigSystem extends System {
    * Update
    */
   update() {
-    for (const key in this._entities) {
-      this._entities[key].update();
-    }
-
+    this._updateEntities();
     this._updatePlayers();
   }
 
@@ -152,9 +149,6 @@ export class RigSystem extends System {
    */
   dispose() {
     this._removeEventListeners();
-
-    for (const key in this._entities) {
-      this._entities[key].dispose();
-    }
+    this._disposeEntities();
   }
 }

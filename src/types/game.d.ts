@@ -1,8 +1,18 @@
 import { DataConnection, PeerError } from 'peerjs';
+import { Entity } from 'src/helpers/Game/Entities';
 import * as THREE from 'three';
 
 export enum EGameEvents {
   INITIALIZED = 'initialized',
+}
+
+export enum EComponentType {
+  Collider,
+}
+
+export enum EColliderType {
+  BOX,
+  SPHERE,
 }
 
 export enum EPeerDataType {
@@ -30,6 +40,8 @@ export enum ENoteCutDirection {
 }
 
 export type TEntityID = number;
+
+export type TColliderID = string;
 
 export type TPeerId = string;
 

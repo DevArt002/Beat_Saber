@@ -62,11 +62,10 @@ export class StatsSystem extends System {
   update() {
     if (this._stats === null || this._rendererInfoContainer === null) return;
 
+    this._updateEntities();
+
     // Update stats
     this._stats.update();
-    for (const key in this._entities) {
-      this._entities[key].update();
-    }
 
     // Update renderer info
     const { memory, render, programs } = this._game.renderer.info;
@@ -87,8 +86,6 @@ export class StatsSystem extends System {
    */
   dispose() {
     this._container?.remove();
-    for (const key in this._entities) {
-      this._entities[key].dispose();
-    }
+    this._disposeEntities();
   }
 }

@@ -1,12 +1,15 @@
+import * as THREE from 'three';
+
 import { Entity } from './Entity';
 import { RigSystem } from 'src/helpers/Game/Systems';
 import { SaberEntity } from './SaberEntity';
+import { disposeObject } from 'src/utils';
 
-export class BeatSaberRigEntity extends Entity {
+export class BeatSaberRigEntity extends Entity<THREE.Object3D> {
   protected _saberEntities: [SaberEntity, SaberEntity];
 
   constructor(private readonly _rigSystem: RigSystem) {
-    super();
+    super(new THREE.Object3D());
 
     // Saber entities
     const leftSaber = new SaberEntity(0xff0000);
@@ -34,10 +37,19 @@ export class BeatSaberRigEntity extends Entity {
   /**
    * Update
    */
-  update() {}
+  update(delta?: number) {
+    this.leftSaber.update();
+    this.rightSaber.update();
+    this._updateComponents(delta);
+  }
 
   /**
    * Dispose
    */
-  dispose() {}
+  dispose() {
+    this.leftSaber.dispose();
+    this.rightSaber.dispose();
+    this._disposeComponents();
+    disposeObject(this._object3D);
+  }
 }

@@ -1,9 +1,11 @@
+import * as THREE from 'three';
+
 import { Entity } from 'src/helpers/Game/Entities';
 import { Game } from 'src/helpers';
 import { TEntityID } from 'src/types';
 
 export abstract class System {
-  protected _entities: Record<TEntityID, Entity> = {};
+  protected _entities: Record<TEntityID, Entity<THREE.Object3D>> = {};
 
   constructor(protected readonly _game: Game) {}
 
@@ -13,7 +15,7 @@ export abstract class System {
   }
 
   // Getter of entities
-  get entities(): Record<TEntityID, Entity> {
+  get entities(): Record<TEntityID, Entity<THREE.Object3D>> {
     return this._entities;
   }
 
@@ -21,11 +23,11 @@ export abstract class System {
    * Add single entity
    * @param entity
    */
-  addEntity(entity: Entity, parent?: THREE.Object3D) {
+  addEntity(entity: Entity<THREE.Object3D>, parent?: THREE.Object3D) {
     if (parent) {
-      parent.add(entity);
+      parent.add(entity.object3D);
     } else {
-      this._game.scene.add(entity);
+      this._game.scene.add(entity.object3D);
     }
     this._entities[entity.id] = entity;
   }
@@ -34,7 +36,7 @@ export abstract class System {
    * Add multiple entities
    * @param entities
    */
-  addEntities(entities: Entity[], parent?: THREE.Object3D) {
+  addEntities(entities: Entity<THREE.Object3D>[], parent?: THREE.Object3D) {
     entities.forEach((entity) => this.addEntity(entity, parent));
   }
 
@@ -43,7 +45,7 @@ export abstract class System {
    * @param entityId
    * @returns Entity
    */
-  getEntity(entityId: TEntityID): Entity | null {
+  getEntity(entityId: TEntityID): Entity<THREE.Object3D> | null {
     return this._entities[entityId] ?? null;
   }
 
@@ -52,7 +54,7 @@ export abstract class System {
    * @param entityIds
    * @returns Entities
    */
-  getEntitys(entityIds: TEntityID[]): Array<Entity | null> {
+  getEntitys(entityIds: TEntityID[]): Array<Entity<THREE.Object3D> | null> {
     return entityIds.map((entityId) => this.getEntity(entityId));
   }
 
@@ -61,7 +63,7 @@ export abstract class System {
    * @param entityId
    */
   removeEntity(entityId: TEntityID) {
-    this._entities[entityId]?.removeFromParent();
+    this._entities[entityId]?.object3D.removeFromParent();
     delete this._entities[entityId];
   }
 
@@ -83,20 +85,34 @@ export abstract class System {
   onXRPresent(isPresenting: boolean) {}
 
   /**
+   * Update entities
+   */
+  protected _updateEntities(delta?: number) {
+    for (const key in this._entities) {
+      this._entities[key].update(delta);
+    }
+  }
+
+  /**
+   * Dispose entities
+   */
+  protected _disposeEntities() {
+    for (const key in this._entities) {
+      this._entities[key].dispose();
+    }
+  }
+
+  /**
    * Update
    */
-  update() {
-    for (const key in this._entities) {
-      this._entities[key].update();
-    }
+  update(delta?: number) {
+    this._updateEntities(delta);
   }
 
   /**
    * Dispose
    */
   dispose() {
-    for (const key in this._entities) {
-      this._entities[key].dispose();
-    }
+    this._disposeEntities();
   }
 }

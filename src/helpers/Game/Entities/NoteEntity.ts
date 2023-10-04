@@ -1,13 +1,15 @@
 import * as THREE from 'three';
 
 import { ENoteCutDirection, ENoteType } from 'src/types';
-import { disposeObject, getHexColorByNoteType } from 'src/utils';
 
+import { ColliderComponent } from 'src/helpers/Game/Components';
 import { Entity } from './Entity';
 import { NotesEntity } from './NotesEntity';
 import { ROTATION_BY_CUT_DIR } from 'src/constants';
+import { getHexColorByNoteType } from 'src/utils';
 
-export class NoteEntity extends Entity {
+export class NoteEntity extends Entity<THREE.Mesh> {
+  private _colliderComponent: ColliderComponent<NoteEntity>;
   private _noteType: ENoteType = ENoteType.RED;
   private _lineIndex: number = 0;
   private _lineLayer: number = 0;
@@ -16,7 +18,21 @@ export class NoteEntity extends Entity {
   private _isPlaying: boolean = false;
 
   constructor(private readonly _notesEntity: NotesEntity, private readonly _index: number) {
-    super();
+    super(new THREE.Mesh());
+
+    const { noteSize, beatSaberSystem } = _notesEntity;
+    const { saberEntities } = beatSaberSystem;
+
+    // Add note geometry, but hide during rendering
+    this.object3D.geometry = new THREE.BoxGeometry(noteSize, noteSize, noteSize);
+    this.object3D.visible = false;
+
+    // Add collider component
+    const colliderComponent = new ColliderComponent(this);
+    this.addComponent(colliderComponent);
+    // Saber entities are collidable with notes
+    colliderComponent.collidableEntities = new Set((saberEntities ?? []) as Entity<THREE.Mesh>[]);
+    this._colliderComponent = colliderComponent;
   }
 
   // Getter of note type
@@ -153,9 +169,9 @@ export class NoteEntity extends Entity {
    * Update instance's color
    */
   private _updateInstanceColor(hex: number) {
-    this._notesEntity.setColorAt(this._index, this._color.setHex(hex));
-    if (this._notesEntity.instanceColor) {
-      this._notesEntity.instanceColor.needsUpdate = true;
+    this._notesEntity.object3D.setColorAt(this._index, this._color.setHex(hex));
+    if (this._notesEntity.object3D.instanceColor) {
+      this._notesEntity.object3D.instanceColor.needsUpdate = true;
     }
   }
 
@@ -164,8 +180,20 @@ export class NoteEntity extends Entity {
    */
   private _updateInstanceMatrix() {
     this.updateMatrix();
-    this._notesEntity.setMatrixAt(this._index, this.matrix);
-    this._notesEntity.instanceMatrix.needsUpdate = true;
+    this._notesEntity.object3D.setMatrixAt(this._index, this.matrix);
+    this._notesEntity.object3D.instanceMatrix.needsUpdate = true;
+  }
+
+  /**
+   * Listener when xr presenting state is changed
+   * @param isPresenting
+   */
+  onXRPresent(isPresenting: boolean) {
+    // Update collidable entities with xr/non-xr sabers
+    const { saberEntities } = this._notesEntity.beatSaberSystem;
+    this._colliderComponent.collidableEntities = new Set(
+      (saberEntities ?? []) as Entity<THREE.Mesh>[],
+    );
   }
 
   /**
@@ -175,12 +203,6 @@ export class NoteEntity extends Entity {
     if (!this._isPlaying || !delta) return;
 
     this._moveForwrard(delta);
-  }
-
-  /**
-   * Dispose
-   */
-  dispose() {
-    disposeObject(this);
+    this._updateComponents(delta);
   }
 }

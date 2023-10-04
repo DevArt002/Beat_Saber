@@ -10,11 +10,11 @@ export class XRRigEntity extends BeatSaberRigEntity {
 
     // XR controllers
     const controller1 = renderer.xr.getController(0);
-    controller1.add(this.rightSaber);
+    controller1.add(this.rightSaber.object3D);
     this.add(controller1);
 
     const controller2 = renderer.xr.getController(1);
-    controller2.add(this.leftSaber);
+    controller2.add(this.leftSaber.object3D);
     this.add(controller2);
     this.position.y = HAND_HEIGHT;
   }
