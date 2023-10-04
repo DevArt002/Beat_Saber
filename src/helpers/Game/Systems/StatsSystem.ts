@@ -8,7 +8,6 @@ export class StatsSystem extends System {
   private _container: HTMLDivElement | null = null;
   private _rendererInfoContainer: HTMLDivElement | null = null;
   private _statsEntity: StatsEntity | null = null;
-  private _visibleStatsEntity: boolean = false;
 
   constructor(game: Game) {
     super(game);
@@ -20,7 +19,7 @@ export class StatsSystem extends System {
   }
 
   /**
-   * Initialize 2D stats view
+   * Initialize
    */
   init() {
     // Instantiate stats
@@ -38,16 +37,30 @@ export class StatsSystem extends System {
     this._container.appendChild(this._rendererInfoContainer);
     this._container.appendChild(this._stats.dom);
     this._game.container.appendChild(this._container);
-    // Instantiate 3D stats, but not add to scene yet
+    // Instantiate 3D stats, but don't add to scene yet
     this._statsEntity = new StatsEntity(this); // 3D stats
+  }
+
+  /**
+   * Listener when xr presenting state is changed
+   * @param isPresenting
+   */
+  onXRPresent(isPresenting: boolean) {
+    if (this._statsEntity === null) return;
+
+    // Add/Remove 3D stats conditionally
+    if (isPresenting) {
+      this.addEntity(this._statsEntity);
+    } else {
+      this.removeEntity(this._statsEntity.id);
+    }
   }
 
   /**
    * Update
    */
   update() {
-    if (this._stats === null || this._statsEntity === null || this._rendererInfoContainer === null)
-      return;
+    if (this._stats === null || this._rendererInfoContainer === null) return;
 
     // Update stats
     this._stats.update();
@@ -67,19 +80,6 @@ export class StatsSystem extends System {
       Lines: ${render.lines} <br />
       Programs: ${programs?.length} <br />
     `;
-
-    // Add/Remove 3D stats conditionally
-    if (this._game.renderer.xr.isPresenting) {
-      if (!this._visibleStatsEntity) {
-        this.addEntity(this._statsEntity);
-        this._visibleStatsEntity = true;
-      }
-    } else {
-      if (this._visibleStatsEntity) {
-        this.removeEntity(this._statsEntity.id);
-        this._visibleStatsEntity = false;
-      }
-    }
   }
 
   /**

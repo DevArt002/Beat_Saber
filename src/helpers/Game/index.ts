@@ -5,6 +5,7 @@ import { IS_DEV } from 'src/constants';
 import { StatsSystem } from './Systems';
 
 export class Game extends THREE.EventDispatcher<any> {
+  // Renderer related attributes
   private _renderer: THREE.WebGLRenderer; // Webgl renderer
   private _scene: THREE.Scene; // Scene
   private _camera: THREE.PerspectiveCamera; // Perspective camera
@@ -15,6 +16,8 @@ export class Game extends THREE.EventDispatcher<any> {
 
   // Systems
   private _statsSystem: StatsSystem = new StatsSystem(this);
+
+  private _prevIsXR: boolean = false;
 
   constructor(private readonly _container: HTMLDivElement) {
     super();
@@ -188,6 +191,12 @@ export class Game extends THREE.EventDispatcher<any> {
    * Update
    */
   private _update = () => {
+    // Entered/Exited XR mode
+    if (this._renderer.xr.isPresenting !== this._prevIsXR) {
+      this._prevIsXR = !this._prevIsXR;
+      this._statsSystem.onXRPresent(this._prevIsXR);
+    }
+
     // Render scene
     this._renderer.render(this._scene, this._camera);
 
