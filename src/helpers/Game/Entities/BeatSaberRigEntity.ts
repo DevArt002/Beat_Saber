@@ -5,7 +5,7 @@ import { SaberEntity } from './SaberEntity';
 export class BeatSaberRigEntity extends Entity {
   protected _saberEntities: [SaberEntity, SaberEntity];
 
-  constructor(rigSystem: RigSystem) {
+  constructor(private readonly _rigSystem: RigSystem) {
     super();
 
     // Saber entities

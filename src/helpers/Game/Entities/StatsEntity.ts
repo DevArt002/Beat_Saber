@@ -7,9 +7,9 @@ import { disposeObject } from 'src/utils';
 export class StatsEntity extends InteractiveGroup implements Entity {
   private _statsMesh: HTMLMesh | null = null;
 
-  constructor(statsSystem: StatsSystem) {
-    const { stats } = statsSystem;
-    const { renderer, camera } = statsSystem.game;
+  constructor(private readonly _statsSystem: StatsSystem) {
+    const { stats } = _statsSystem;
+    const { renderer, camera } = _statsSystem.game;
 
     super(renderer, camera);
 

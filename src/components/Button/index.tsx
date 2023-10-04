@@ -14,7 +14,7 @@ export const Button: FC<IButtonProps> = memo(
     return (
       <button
         className={clsx(
-          'rounded bg-red-400 p-2 text-white',
+          'rounded bg-red-400 p-2 text-sm text-white',
           disabled ? 'opacity-50' : 'hover:bg-red-500 active:bg-red-600',
           className,
         )}

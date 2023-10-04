@@ -29,9 +29,9 @@ export const OverlayMenu: FC<IOverlayMenuProps> = ({
     <div className={clsx('h-full w-full p-3', className)} style={style} {...rest}>
       {/* Ready status */}
       <div className="absolute top-0 left-0 z-10 flex flex-col gap-1 p-3">
-        <p className="text-red text-xs font-bold">{`You-${ready ? 'Ready' : 'Not Ready'}`}</p>
+        <p className="text-xs font-bold text-red-600">{`You-${ready ? 'Ready' : 'Not Ready'}`}</p>
         {Object.entries(readyConnections).map(([peerId, peerReady]) => (
-          <p key={peerId} className="text-red text-xs font-bold">{`${peerId}-${
+          <p key={peerId} className="text-xs font-bold text-red-600">{`${peerId}-${
             peerReady ? 'Ready' : 'Not Ready'
           }`}</p>
         ))}
@@ -39,10 +39,18 @@ export const OverlayMenu: FC<IOverlayMenuProps> = ({
       {/* Menu */}
       <div className="absolute right-0 bottom-0 z-10 flex flex-col gap-2 p-3">
         {(IS_VR_SUPPORT || IS_AR_SUPPORT) && (
-          <Button onClick={onRequestXRSession}>Enter XR Mode</Button>
+          <Button className="w-28" onClick={onRequestXRSession}>
+            Enter XR Mode
+          </Button>
         )}
-        {!allReady && <Button onClick={onReadyToggle}>{ready ? 'Not Ready' : 'Ready'}</Button>}
-        <Button onClick={onDisconnect}>Exit</Button>
+        {!allReady && (
+          <Button className="w-28" onClick={onReadyToggle}>
+            {ready ? 'Not Ready' : 'Ready'}
+          </Button>
+        )}
+        <Button className="w-28" onClick={onDisconnect}>
+          Exit
+        </Button>
       </div>
     </div>
   );
