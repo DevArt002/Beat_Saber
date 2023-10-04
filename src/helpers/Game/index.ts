@@ -133,12 +133,12 @@ export class Game extends THREE.EventDispatcher<any> {
    * Initialize game scene and other rest functionalities
    */
   async init() {
-    this._rigSystem.init();
-    this._beatSaberSystem.init();
+    await this._rigSystem.init();
+    await this._beatSaberSystem.init();
 
     // Dev systems, which are visible only in dev environment
     if (IS_DEV) {
-      this._statsSystem.init();
+      await this._statsSystem.init();
     }
 
     this._addEventListeners();

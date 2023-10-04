@@ -9,6 +9,7 @@ import {
 } from 'src/helpers/Game/Entities';
 import { EPeerDataType, INoteCubeData } from 'src/types';
 
+import BEAT_SABER_TRACK from '/audio/beat_saber_track.mp3';
 import { Game } from 'src/helpers';
 import { System } from './System';
 
@@ -31,6 +32,7 @@ export class BeatSaberSystem extends System {
   private readonly _beatsForFly: number;
   private readonly _notes: Record<number, INoteCubeData[]> = {};
   private readonly _maxNoteCount = 20;
+  private readonly _track = new Audio(BEAT_SABER_TRACK);
   private _isPlaying: boolean = false;
   private _prevBeat: number = -1;
   private _score: number = 0;
@@ -95,7 +97,9 @@ export class BeatSaberSystem extends System {
   /**
    * Initialize
    */
-  init() {
+  async init() {
+    // Load audio track
+    await this._loadAudioTrack();
     // Bake beat saber data first
     this._bakeBSMData();
 
@@ -115,7 +119,7 @@ export class BeatSaberSystem extends System {
     this._clock.stop();
 
     // TODO Remove
-    // this.play();
+    this.play();
   }
 
   /**
@@ -133,6 +137,22 @@ export class BeatSaberSystem extends System {
   }
 
   /**
+   * Load audio track
+   * @returns
+   */
+  private async _loadAudioTrack() {
+    return new Promise((resolve, reject) => {
+      try {
+        this._track.addEventListener('canplaythrough', resolve);
+      } catch (error) {
+        console.error(error);
+        this._track.removeEventListener('canplaythrough', resolve);
+        reject();
+      }
+    });
+  }
+
+  /**
    * Play
    */
   play() {
@@ -140,6 +160,7 @@ export class BeatSaberSystem extends System {
 
     this._isPlaying = true;
     this._clock.start();
+    this._track.play();
   }
 
   /**
@@ -151,6 +172,8 @@ export class BeatSaberSystem extends System {
 
     this._isPlaying = false;
     this._clock.stop();
+    this._track.pause();
+    this._track.currentTime = 0;
   }
 
   /**
