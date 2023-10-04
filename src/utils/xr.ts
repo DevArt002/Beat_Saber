@@ -1,6 +1,9 @@
 import { EXRSessionSupportType } from 'src/types';
 
-// Get types of xr support
+/**
+ * Get types of xr support
+ * @returns
+ */
 export async function getXRSupportTypes(): Promise<Set<EXRSessionSupportType>> {
   const supportTypes = new Set<EXRSessionSupportType>();
 
