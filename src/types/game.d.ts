@@ -5,19 +5,54 @@ export enum EGameEvents {
   INITIALIZED = 'initialized',
 }
 
-export enum EComponentType {
-  Transform,
-  XRRig,
-}
-
 export enum EPeerDataType {
   INITIAL_CONNECT,
   PLAYER,
 }
 
+export enum ENoteType {
+  RED,
+  BLUE,
+  Unused,
+  Bomb,
+}
+export enum ENoteCutDirection {
+  UP,
+  DOWN,
+  LEFT,
+  RIGHT,
+  UP_LEFT,
+  UP_RIGHT,
+  DOWN_LEFT,
+  DOWN_RIGHT,
+  Any, // dot
+}
+
 export type TEntityID = number;
 
 export type TPeerId = string;
+
+export interface INoteCubeData {
+  _time: number;
+  _lineIndex: number;
+  _lineLayer: number;
+  _type: ENoteType;
+  _cutDirection: ENoteCutDirection;
+}
+
+export interface IBSMGDifficultyData {
+  _version: string;
+  _BPMChanges: any;
+  _events: any;
+  _notes: INoteCubeData[];
+  _obstacles: any;
+  _bookmarks: any;
+}
+
+export interface IBSMGInfoData {
+  _beatsPerMinute: number;
+  [key: string]: any; // TODO Define details
+}
 
 export interface IPeerBaseData {
   type: EPeerDataType;

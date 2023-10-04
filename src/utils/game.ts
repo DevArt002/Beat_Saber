@@ -1,5 +1,7 @@
 import * as THREE from 'three';
 
+import { ENoteType } from 'src/types';
+
 /**
  * Get all textures from given material
  * @param material
@@ -109,4 +111,14 @@ export function disposeObjects(objects: Array<THREE.Object3D | null | undefined>
   for (const object of objects) {
     disposeObject(object);
   }
+}
+
+/**
+ * Get color by note type
+ */
+export function getHexColorByNoteType(noteType: ENoteType): number {
+  if (noteType === ENoteType.RED) return 0xff0000;
+  if (noteType === ENoteType.BLUE) return 0x0000ff;
+
+  return 0x000000;
 }

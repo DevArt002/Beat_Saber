@@ -8,7 +8,7 @@ export abstract class Entity extends THREE.Object3D {
   /**
    * Update
    */
-  abstract update(): void;
+  abstract update(delta?: number): void;
 
   /**
    * Dispose

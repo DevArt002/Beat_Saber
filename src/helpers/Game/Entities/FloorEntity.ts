@@ -3,13 +3,10 @@ import * as THREE from 'three';
 import { Entity } from './Entity';
 
 export class FloorEntity extends THREE.Mesh implements Entity {
-  private _size: THREE.Vector2Tuple = [3, 20];
-
-  constructor() {
+  constructor(private readonly _size: THREE.Vector2Tuple) {
     super();
 
-    const [w, d] = this._size;
-    this.geometry = new THREE.PlaneGeometry(w, d);
+    this.geometry = new THREE.PlaneGeometry(_size[0], _size[1]);
     this.material = new THREE.MeshBasicMaterial({ color: 0x000000 });
     this.rotateX(-Math.PI / 2);
   }
