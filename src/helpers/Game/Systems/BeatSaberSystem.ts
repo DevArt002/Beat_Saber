@@ -117,9 +117,6 @@ export class BeatSaberSystem extends System {
 
     // Stop clock
     this._clock.stop();
-
-    // TODO Remove
-    this.play();
   }
 
   /**

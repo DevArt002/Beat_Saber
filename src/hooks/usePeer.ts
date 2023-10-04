@@ -1,12 +1,13 @@
-import { ChangeEvent, FormEvent, useCallback, useEffect, useState } from 'react';
 import {
   EPeerDataType,
   IPeerInitialConnectData,
   IPeerPlayerData,
+  IPeerReadyData,
   TPeerData,
   TPeerId,
 } from 'src/types';
 import { broadcastPeer, broadcastPeers, connectPeer, disconnectPeers, peer } from 'src/utils';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { DataConnection } from 'peerjs';
 import { useToggle } from './useToggle';
@@ -19,28 +20,39 @@ export const usePeer = (
   players: Record<TPeerId, IPeerPlayerData>,
 ): {
   peerId: TPeerId;
-  destPeerId: TPeerId;
   connected: boolean;
-  connections: Record<string, DataConnection>;
-  onChangeDestPeerId: (e: ChangeEvent<HTMLInputElement>) => void;
-  onConnect: (e: FormEvent<HTMLFormElement>) => void;
+  ready: boolean;
+  allReady: boolean;
+  connections: Record<TPeerId, DataConnection>;
+  readyConnections: Record<TPeerId, boolean>;
+  onConnect: (destPeerId: TPeerId) => void;
   onDisconnect: () => void;
+  onReadyToggle: () => void;
   onBroadcast: (data: TPeerData) => void;
 } => {
   const [peerId, setPeerId] = useState<TPeerId>('');
-  const [destPeerId, setDestPeerId] = useState<TPeerId>('');
-  const [connections, setConnections] = useState<Record<string, DataConnection>>({});
+  const [connections, setConnections] = useState<Record<TPeerId, DataConnection>>({});
+  const [readyConnections, setReadyConnections] = useState<Record<TPeerId, boolean>>({});
   const [connected, { toggleOn: toggleOnConnected, toggleOff: toggleOffConnected }] =
     useToggle(false);
+  const [ready, { toggle: toggleReady, toggleOff: toggleOffReady }] = useToggle(false);
 
-  // Handler for changing dest peer id
-  const onChangeDestPeerId = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-    setDestPeerId(e.target.value);
-  }, []);
+  const allReady = useMemo(() => {
+    const readyConnectionsArr = Object.values(readyConnections);
+    const othersReady = readyConnectionsArr.length === readyConnectionsArr.filter(Boolean).length;
+
+    return othersReady && ready;
+  }, [ready, readyConnections]);
 
   // Listen when connection is opened
   const onConnectionOpen = useCallback(
     (connection: DataConnection) => {
+      // If the game was already started under the allReady state, refuse new connection
+      if (allReady) {
+        return connection.close();
+      }
+
+      // Add new connection to connection record
       setConnections((cur) => {
         if (!(connection.peer in cur)) {
           console.info(`Connected a peer: ${connection.peer}`);
@@ -53,14 +65,28 @@ export const usePeer = (
 
         return cur;
       });
+      // Add new connection to ready record
+      setReadyConnections((cur) => {
+        cur[connection.peer] = false;
+
+        return cur;
+      });
+
       toggleOnConnected();
     },
-    [toggleOnConnected],
+    [allReady, toggleOnConnected],
   );
 
   // Listen when connection is closed
   const onConnectionClose = useCallback((connection: DataConnection) => {
+    // Remove connection from connection record
     setConnections((cur) => {
+      delete cur[connection.peer];
+
+      return { ...cur };
+    });
+    // Remove connection from ready record
+    setReadyConnections((cur) => {
       delete cur[connection.peer];
 
       return { ...cur };
@@ -71,6 +97,7 @@ export const usePeer = (
   const onConnectionReceivedData = useCallback(
     (connection: DataConnection, data: TPeerData) => {
       // Initial connect data
+      // User will connect to rest of players
       if (data.type === EPeerDataType.INITIAL_CONNECT) {
         for (const peerId of (data as IPeerInitialConnectData).peerIds) {
           if (connections[peerId]) continue;
@@ -82,7 +109,16 @@ export const usePeer = (
           });
         }
       }
-      // Player data
+      // Ready status
+      else if (data.type === EPeerDataType.Ready) {
+        // Update ready record
+        setReadyConnections((cur) => {
+          cur[connection.peer] = (data as IPeerReadyData).ready;
+
+          return { ...cur };
+        });
+      }
+      // Player data which update game data as realtime
       else if (data.type === EPeerDataType.PLAYER) {
         players[connection.peer] = data as IPeerPlayerData;
       }
@@ -106,23 +142,22 @@ export const usePeer = (
 
   // Handler for submit on connect form
   const onConnect = useCallback(
-    (e: FormEvent<HTMLFormElement>) => {
-      e.preventDefault();
-
+    (destPeerId: TPeerId) => {
       connectPeer(destPeerId, {
         onOpen: onConnectionOpen,
         onClose: onConnectionClose,
         onReceivedData: onConnectionReceivedData,
       });
     },
-    [destPeerId, onConnectionOpen, onConnectionClose, onConnectionReceivedData],
+    [onConnectionOpen, onConnectionClose, onConnectionReceivedData],
   );
 
   // Handler for disconnect
   const onDisconnect = useCallback(() => {
     disconnectPeers(Object.values(connections));
     toggleOffConnected();
-  }, [connections, toggleOffConnected]);
+    toggleOffReady();
+  }, [connections, toggleOffConnected, toggleOffReady]);
 
   // Handler for broadcast
   const onBroadcast = useCallback(
@@ -132,14 +167,26 @@ export const usePeer = (
     [connections],
   );
 
+  // Handler for toggling ready status
+  const onReadyToggle = useCallback(() => {
+    toggleReady();
+  }, [toggleReady]);
+
+  // Try to broadcast user's ready status
+  useEffect(() => {
+    onBroadcast({ type: EPeerDataType.Ready, ready });
+  }, [connections, onBroadcast, ready]);
+
   return {
     peerId,
-    destPeerId,
     connected,
+    ready,
+    allReady,
     connections,
-    onChangeDestPeerId,
+    readyConnections,
     onConnect,
     onDisconnect,
+    onReadyToggle,
     onBroadcast,
   };
 };

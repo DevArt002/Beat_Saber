@@ -145,21 +145,29 @@ export class Game extends THREE.EventDispatcher<any> {
 
     // Dipatch event that says game is ready to play
     this.dispatchEvent({ type: EGameEvents.INITIALIZED });
+  }
 
-    // Loop
+  /**
+   * Start game rendering, but not play mode
+   */
+  start() {
     this._renderer.setAnimationLoop(this._update);
   }
 
-  // /**
-  //  * Load assets
-  //  */
-  // private async _loadAssets() {
-  //   try {
-  //     // TODO Loading logic
-  //   } catch (error) {
-  //     console.error(error);
-  //   }
-  // }
+  /**
+   * Stop game rendering
+   */
+  stop() {
+    this._renderer.setAnimationLoop(null);
+    this._beatSaberSystem.stop();
+  }
+
+  /**
+   * Play main game
+   */
+  play() {
+    this._beatSaberSystem.play();
+  }
 
   /**
    * Add event listeners

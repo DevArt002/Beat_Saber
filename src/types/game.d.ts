@@ -7,6 +7,7 @@ export enum EGameEvents {
 
 export enum EPeerDataType {
   INITIAL_CONNECT,
+  Ready,
   PLAYER,
 }
 
@@ -62,12 +63,16 @@ export interface IPeerInitialConnectData extends IPeerBaseData {
   peerIds: string[]; // Peer ids who joined the lobby already
 }
 
+export interface IPeerReadyData extends IPeerBaseData {
+  ready: boolean; // Tell others my ready status
+}
+
 export interface IPeerPlayerData extends IPeerBaseData {
   score: number; // Player score
   sabersMatrix: [THREE.Matrix4 | undefined, THREE.Matrix4 | undefined];
 }
 
-export type TPeerData = IPeerInitialConnectData | IPeerPlayerData;
+export type TPeerData = IPeerInitialConnectData | IPeerReadyData | IPeerPlayerData;
 
 export type TPeerConnectCallbacks = {
   onIceStateChanged?: (connection: DataConnection, state: RTCIceConnectionState) => void;

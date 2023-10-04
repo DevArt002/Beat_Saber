@@ -62,6 +62,7 @@ module.exports = {
     'react/react-in-jsx-scope': 'off',
     'react/display-name': 'off',
     'jsx-a11y/accessible-emoji': 'off',
+    'jsx-a11y/no-autofocus': 'off',
     'react/prop-types': 'off',
     '@typescript-eslint/explicit-function-return-type': 'off',
     'simple-import-sort/imports': 'off',
