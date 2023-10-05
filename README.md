@@ -48,6 +48,7 @@ npm run release
 - Typescript
 - Vite
 - Three.js
+- PeerJS
 - Tailwind CSS
 - ESLint
 - Prettier
@@ -59,4 +60,5 @@ npm run release
 - **Increasing draw calls**: For multiplayer, each player's rig/sabers and score entities are causing extra draw calls. This can be reduced by using instanced mesh or other approach.
 - **Lack of collider types**: Currently, only Box collider is supported. It can be improved by adding support for Plane, Sphere, and Convex colliders.
 - **Missing global state management**: Consider using Redux or React Context for sharing states between React components. Additionally, Mobx is suitable for state sharing between Three.js ECS classes and React components.
+- **Missing game decoration** Beat notes should have 2 more variants(bomb and unused) and cut directions. And walls can be added. And game environment should be decorated too. 
 - etc.
