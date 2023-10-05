@@ -2,7 +2,8 @@ import * as THREE from 'three';
 
 import { BeatSaberSystem, RigSystem, StatsSystem } from './Systems';
 import { EGameEvents, IPeerPlayerData, TPeerData, TPeerId } from 'src/types';
-import { IS_DEV, RIG_HEIGHT } from 'src/constants';
+
+import { RIG_HEIGHT } from 'src/constants';
 
 export class Game extends THREE.EventDispatcher<any> {
   // Renderer related attributes
@@ -136,11 +137,7 @@ export class Game extends THREE.EventDispatcher<any> {
   async init() {
     await this._rigSystem.init();
     await this._beatSaberSystem.init();
-
-    // Dev systems, which are visible only in dev environment
-    if (IS_DEV) {
-      await this._statsSystem.init();
-    }
+    await this._statsSystem.init();
 
     this._addEventListeners();
 
