@@ -2,13 +2,11 @@
 
 Browser-based Beat Saber multiplayer game with support for 2+ players. The game includes a single audio track synchronized with beats for players to follow. It has been tested and confirmed to work on desktop/laptop computers and the Oculus Quest 2 VR headset.
 
-**Live Demo**
-https://beat-saber.surge.sh/
+[**Live Demo**](https://beat-saber.surge.sh/)
 
-**Preview**
+[**Desktop Recording**](https://www.veed.io/view/98a48207-0bb0-4b5b-9a14-cc2bd37d7456?sharingWidget=true&panel=share)
 
-[Desktop](https://www.veed.io/view/98a48207-0bb0-4b5b-9a14-cc2bd37d7456?sharingWidget=true&panel=share)
-[Oculus Quest 2](https://www.veed.io/view/b976acf5-e367-478b-aff3-b3cc11aaea71?sharingWidget=true&panel=share)
+[**Oculus Quest 2 Recording**](https://www.veed.io/view/b976acf5-e367-478b-aff3-b3cc11aaea71?sharingWidget=true&panel=share)
 
 ### Development
 
