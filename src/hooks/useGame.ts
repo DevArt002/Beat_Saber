@@ -1,8 +1,8 @@
-import { EGameEvents, IPeerPlayerData, TPeerData, TPeerId } from 'src/types';
-import { IS_AR_SUPPORT, IS_VR_SUPPORT } from 'src/constants';
+import { EGameEvents, EXRSessionSupportType, IPeerPlayerData, TPeerData, TPeerId } from 'src/types';
 import { MutableRefObject, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { Game } from 'src/helpers';
+import { getXRSupportTypes } from 'src/utils';
 import { useToggle } from './useToggle';
 
 /**
@@ -17,12 +17,28 @@ export const useGame = (
 ): {
   gameContainerRef: MutableRefObject<HTMLDivElement | null>;
   gameInstance: Game | null;
+  isVRSupport: boolean;
+  isARSupport: boolean;
   loading: boolean;
   onRequestXRSession: () => void;
 } => {
+  const [isVRSupport, { toggleOn: toggleOnIsVRSupport }] = useToggle(false);
+  const [isARSupport, { toggleOn: toggleOnIsARSupport }] = useToggle(false);
   const [loading, { toggleOff: toggleOffLoading }] = useToggle(true);
   const [gameInstance, setGameInstance] = useState<Game | null>(null);
   const gameContainerRef = useRef<HTMLDivElement | null>(null);
+
+  // Check xr support types
+  const checkXRSupport = useCallback(async () => {
+    const xrSupportTypes = await getXRSupportTypes();
+
+    if (xrSupportTypes.has(EXRSessionSupportType.SUPPORTED_VR)) toggleOnIsVRSupport();
+    if (xrSupportTypes.has(EXRSessionSupportType.SUPPORTED_AR)) toggleOnIsARSupport();
+  }, [toggleOnIsARSupport, toggleOnIsVRSupport]);
+
+  useEffect(() => {
+    checkXRSupport();
+  }, [checkXRSupport]);
 
   // Get current xr session
   const currentXRSession = useMemo(
@@ -56,10 +72,10 @@ export const useGame = (
     }
 
     let mode: XRSessionMode | null = null;
-    if (IS_VR_SUPPORT) {
+    if (isVRSupport) {
       mode = 'immersive-vr';
     }
-    if (IS_AR_SUPPORT) {
+    if (isARSupport) {
       mode = 'immersive-ar';
     }
 
@@ -71,7 +87,7 @@ export const useGame = (
     };
 
     await navigator.xr.requestSession(mode, options).then(onXRSessionStarted);
-  }, [currentXRSession, onXRSessionStarted]);
+  }, [currentXRSession, isARSupport, isVRSupport, onXRSessionStarted]);
 
   // Initialize game context here
   useEffect(() => {
@@ -132,5 +148,5 @@ export const useGame = (
     gameInstance.players = players;
   }, [gameInstance, players]);
 
-  return { gameContainerRef, gameInstance, loading, onRequestXRSession };
+  return { gameContainerRef, gameInstance, isVRSupport, isARSupport, loading, onRequestXRSession };
 };

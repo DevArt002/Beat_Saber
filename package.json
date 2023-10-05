@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "scripts": {
     "start": "vite",
-    "build": "VITE_APP_GIT_SHA=`git rev-parse --short HEAD` vite build",
+    "build": "vite build",
     "serve": "vite preview",
     "lint:fix": "eslint ./src --ext .jsx,.js,.ts,.tsx --fix --ignore-path ./.gitignore",
     "lint:check": "eslint ./src --ext .jsx,.js,.ts,.tsx",

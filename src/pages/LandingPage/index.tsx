@@ -20,7 +20,7 @@ export const LandingPage = () => {
     onReadyToggle,
     onBroadcast,
   } = usePeer(playersRef.current);
-  const { gameContainerRef, loading, onRequestXRSession } = useGame(
+  const { gameContainerRef, isARSupport, isVRSupport, loading, onRequestXRSession } = useGame(
     connected,
     allReady,
     playersRef.current,
@@ -35,6 +35,8 @@ export const LandingPage = () => {
           <LoadingSpinner />
         ) : connected ? (
           <OverlayMenu
+            isARSupport={isARSupport}
+            isVRSupport={isVRSupport}
             ready={ready}
             allReady={allReady}
             readyConnections={readyConnections}

@@ -1,11 +1,12 @@
 import { ICommonComponentProps, TPeerId } from 'src/types';
-import { IS_AR_SUPPORT, IS_VR_SUPPORT } from 'src/constants';
 import React, { FC } from 'react';
 
 import { Button } from 'src/components';
 import clsx from 'clsx';
 
 interface IOverlayMenuProps extends ICommonComponentProps {
+  isARSupport: boolean;
+  isVRSupport: boolean;
   ready: boolean;
   allReady: boolean;
   readyConnections: Record<TPeerId, boolean>;
@@ -17,6 +18,8 @@ interface IOverlayMenuProps extends ICommonComponentProps {
 export const OverlayMenu: FC<IOverlayMenuProps> = ({
   className,
   style,
+  isARSupport,
+  isVRSupport,
   ready,
   allReady,
   readyConnections,
@@ -38,7 +41,7 @@ export const OverlayMenu: FC<IOverlayMenuProps> = ({
       </div>
       {/* Menu */}
       <div className="absolute right-0 bottom-0 z-10 flex flex-col gap-2 p-3">
-        {(IS_VR_SUPPORT || IS_AR_SUPPORT) && (
+        {(isVRSupport || isARSupport) && (
           <Button className="w-28" onClick={onRequestXRSession}>
             Enter XR Mode
           </Button>
