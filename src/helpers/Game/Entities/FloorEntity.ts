@@ -7,7 +7,11 @@ export class FloorEntity extends Entity<THREE.Mesh> {
     super(new THREE.Mesh());
 
     this._object3D.geometry = new THREE.PlaneGeometry(_size[0], _size[1]);
-    this._object3D.material = new THREE.MeshBasicMaterial({ color: 0x000000 });
+    this._object3D.material = new THREE.MeshStandardMaterial({
+      color: 0x70cbff,
+      roughness: 0,
+      metalness: 0.5,
+    });
     this._object3D.rotateX(-Math.PI / 2);
   }
 

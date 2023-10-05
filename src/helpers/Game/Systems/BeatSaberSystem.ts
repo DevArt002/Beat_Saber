@@ -26,7 +26,7 @@ export class BeatSaberSystem extends System {
   private readonly _bpm: number; // beats per min
   private readonly _bps: number; // beats per second
   private readonly _tpb: number; // time per beat
-  private readonly _floorSize: THREE.Vector2Tuple = [2, 20]; // Runway width&length is meters
+  private readonly _floorSize: THREE.Vector2Tuple = [2, 25]; // Runway width&length is meters
   private readonly _cellSize: number; // Note size in meters. Assuming the note emitter is 4x3 grid
   private readonly _noteMaxFlyDist: number; // Note is gonna be re-positioned or deleted at the max distance
   private readonly _noteMaxFlyTime: number = 3; // seconds which take to reach at the max distance
@@ -45,7 +45,7 @@ export class BeatSaberSystem extends System {
     this._bps = this._bpm / 60;
     this._tpb = 1 / this._bps;
     this._cellSize = this._floorSize[0] / 4;
-    this._noteMaxFlyDist = this._floorSize[1] + 5;
+    this._noteMaxFlyDist = this._floorSize[1];
     this._noteVelocity = this._noteMaxFlyDist / this._noteMaxFlyTime;
     this._beatsForFly = this._bps * (this._floorSize[1] / this._noteVelocity);
   }

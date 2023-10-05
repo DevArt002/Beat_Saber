@@ -46,7 +46,8 @@ export class Game extends THREE.EventDispatcher<any> {
 
     // Initialize scene
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x00ff00);
+    scene.background = new THREE.Color(0x444444);
+    scene.fog = new THREE.Fog(0x3f7b9d, 17, 24);
     this._scene = scene;
 
     // TODO Expecting camera to be inherited to core entity

@@ -103,11 +103,11 @@ export class RigSystem extends System {
   }
 
   /**
+   * TODO Optimize RTC
    * Update players
    * @param players
    */
   private _updatePlayers() {
-    // TODO Optimize
     Object.entries(this._game.players).forEach(([key, { score, sabersMatrix }], index) => {
       // Update the player rig
       if (key in this._playersRigEntities) {
@@ -132,7 +132,7 @@ export class RigSystem extends System {
         playerRigEntity.position.set(
           3 * (isOddNumber(index) ? 1 : -1) * Math.ceil((index + 1) / 2),
           0,
-          -10,
+          -5,
         );
         this.addEntity(playerRigEntity);
         this._playersRigEntities[key] = playerRigEntity;
