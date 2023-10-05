@@ -43,7 +43,7 @@ export const ConnectForm: FC<IConnectFormProps> = ({
       <TextInput placeholder="...Wait one moment" value={peerId} readonly />
       <p className="text-white">Destination peer ID</p>
       <TextInput
-        placeholder="Input target peer ID"
+        placeholder="Input target peer ID, or 'single'"
         value={destPeerId}
         onChange={onChangeDestPeerId}
         autoFocus

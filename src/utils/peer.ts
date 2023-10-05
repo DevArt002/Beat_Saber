@@ -2,7 +2,8 @@ import Peer, { DataConnection, PeerError } from 'peerjs';
 import { TPeerConnectCallbacks, TPeerData, TPeerId } from 'src/types';
 
 // Peer
-export const peer = new Peer();
+// For easy join in XR headset, just use random number between 1000 and 9999. Assuming there are few users.
+export const peer = new Peer(`${Math.floor(Math.random() * 8999 + 1000)}`);
 
 /**
  * Connect to single peer
